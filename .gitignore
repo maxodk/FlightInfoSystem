@@ -1,45 +1,76 @@
+# ============================
 # Build results
+# ============================
 bin/
 obj/
 out/
 artifacts/
+publish/
 
-# Visual Studio
+# ============================
+# IDE / Editor configs
+# ============================
 .vs/
-*.dbmdl
+.vscode/
+.idea/
+*.iml
 *.suo
 *.user
 *.userosscache
 *.sln.docstates
+*.dbmdl
 
-# Logs
+# ============================
+# Logs / Temp
+# ============================
 *.log
+*.tmp
+*.temp
 
-# OS generated files
+# OS
 .DS_Store
 Thumbs.db
 
-# JetBrains Rider / IntelliJ
-.idea/
-*.iml
-
+# ============================
 # Dotnet artifacts
+# ============================
 project.lock.json
 project.fragment.lock.json
-
-# Docker override (локальні налаштування)
-docker-compose.override.yml
-
-# Environment and secrets
-*.env
-appsettings.Development.json
-appsettings.Local.json
-
-# NuGet packages
-*.nupkg
-*.snupkg
-*.nuspec
 packages/
 
-# Publish output
-publish/
+# ============================
+# Docker
+# ============================
+docker-compose.override.yml
+
+# ============================
+# Sensitive / Important files
+# ============================
+# локальні конфіги БД і ключів
+*.env
+.env.*
+appsettings.Development.json
+appsettings.Local.json
+appsettings.*.json
+
+# сертифікати, ключі, секрети
+*.pfx
+*.pem
+*.key
+*.crt
+
+# резервні копії SQL / даних
+*.bak
+*.sql
+*.mdf
+*.ldf
+*.ndf
+
+# ============================
+# Other
+# ============================
+# Backups
+*.zip
+*.tar
+*.gz
+*.7z
