@@ -57,22 +57,18 @@ FlightInfoSystem/
 ### 1. База даних
 Виконати SQL-скрипт `db/init.sql` у MS SQL Server.
 
-### 2. Запуск FlightStorageService
+### 2–3. Запуск FlightStorageService і FlightClientApp
 ```bash
+# Запуск бекенду
 cd FlightStorageService
 dotnet restore
 dotnet build
 dotnet run
-```bash
-API буде доступне за адресою:
-https://localhost:8081/swagger
+# API буде доступне за адресою: https://localhost:8081/swagger
 
-### 3. Запуск FlightClientApp
-```bash
-cd FlightClientApp
+# Запуск фронтенду
+cd ../FlightClientApp
 dotnet restore
 dotnet build
 dotnet run
-```bash
-UI буде доступне за адресою:
-https://localhost:8082
+# UI буде доступне за адресою: https://localhost:8082
