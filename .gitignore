@@ -58,7 +58,6 @@ appsettings.*.json
 *.crt
 
 *.bak
-*.sql
 *.mdf
 *.ldf
 *.ndf
