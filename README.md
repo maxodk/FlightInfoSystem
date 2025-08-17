@@ -63,6 +63,7 @@ cd FlightStorageService
 dotnet restore
 dotnet build
 dotnet run
+```bash
 API буде доступне за адресою:
 https://localhost:8081/swagger
 
@@ -72,5 +73,6 @@ cd FlightClientApp
 dotnet restore
 dotnet build
 dotnet run
+```bash
 UI буде доступне за адресою:
 https://localhost:8082
