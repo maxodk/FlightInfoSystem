@@ -67,6 +67,7 @@ API буде доступне за адресою:
 https://localhost:8081/swagger
 
 ### 3. Запуск FlightClientApp
+```bash
 cd FlightClientApp
 dotnet restore
 dotnet build
