@@ -46,20 +46,17 @@ docker-compose.override.yml
 # ============================
 # Sensitive / Important files
 # ============================
-# локальні конфіги БД і ключів
 *.env
 .env.*
 appsettings.Development.json
 appsettings.Local.json
 appsettings.*.json
 
-# сертифікати, ключі, секрети
 *.pfx
 *.pem
 *.key
 *.crt
 
-# резервні копії SQL / даних
 *.bak
 *.sql
 *.mdf
