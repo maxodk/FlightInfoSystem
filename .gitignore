@@ -361,3 +361,44 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+---
+
+### .gitignore
+
+```gitignore
+# Build results
+bin/
+obj/
+out/
+artifacts/
+
+# Visual Studio files
+.vs/
+*.dbmdl
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Rider / JetBrains
+.idea/
+*.iml
+
+# Dotnet artifacts
+project.lock.json
+project.fragment.lock.json
+
+# Docker override
+docker-compose.override.yml
+
+# Environment and secrets
+*.env
+appsettings.Development.json
