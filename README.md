@@ -67,7 +67,7 @@ dotnet run
 # API буде доступне за адресою: https://localhost:8081/swagger
 
 # Запуск фронтенду
-cd ../FlightClientApp
+cd .FlightClientApp
 dotnet restore
 dotnet build
 dotnet run
