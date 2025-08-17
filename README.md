@@ -20,7 +20,7 @@
 - Bootstrap (UI)
 
 ## Структура репозиторію
-
+```
 FlightInfoSystem/
 ├── FlightStorageService/ # Web API
 ├── FlightClientApp/ # MVC клієнт
@@ -28,6 +28,7 @@ FlightInfoSystem/
 │ └── init.sql # SQL-скрипт створення БД та збережених процедур
 ├── README.md
 └── .gitignore
+```
 ## База даних
 
 - Назва: `FlightsDb`
