@@ -34,7 +34,11 @@
                     {
                         <tr>
                             <td>@f.FlightNumber</td>
-                            <td>@f.DepartureDateTime.ToString("u")</td>
+                            <td>
+                                <span class="dt"
+                                      data-epoch="@(new DateTimeOffset(DateTime.SpecifyKind(f.DepartureDateTime, DateTimeKind.Utc)).ToUnixTimeMilliseconds())">
+                                </span>
+                            </td>
                             <td>@f.DepartureAirportCity</td>
                             <td>@f.ArrivalAirportCity</td>
                             <td>@f.DurationMinutes</td>
@@ -45,3 +49,20 @@
         </div>
     }
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () 
+    {
+      document.querySelectorAll('.dt').forEach(function (el) 
+      {
+        var ms = Number(el.dataset.epoch);
+        if (!Number.isNaN(ms)) 
+        {
+            el.textContent = new Date(ms).toLocaleString(undefined, 
+            {
+                year: 'numeric', month: '2-digit', day: '2-digit',
+                hour: '2-digit', minute: '2-digit', hour12: false
+            });
+        }
+      });
+    });
+</script>

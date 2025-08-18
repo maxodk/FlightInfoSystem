@@ -22,7 +22,6 @@ public sealed class ProblemDetailsMiddleware
         }
         catch (Exception ex)
         {
-            // Map exception -> HTTP status
             var (status, title) = ex switch
             {
                 ArgumentException => (HttpStatusCode.BadRequest, "Invalid input"),
@@ -31,9 +30,7 @@ public sealed class ProblemDetailsMiddleware
                 _ => (HttpStatusCode.InternalServerError, "Server error")
             };
 
-            // Лог — з трас-ідентифікатором
-            _log.LogError(ex, "Unhandled exception at {Path} (TraceId: {TraceId})",
-                ctx.Request.Path, ctx.TraceIdentifier);
+            _log.LogError(ex, "Unhandled exception at {Path} (TraceId: {TraceId})",ctx.Request.Path, ctx.TraceIdentifier);
 
             var pd = new ProblemDetails
             {
@@ -44,7 +41,6 @@ public sealed class ProblemDetailsMiddleware
                 Type = $"https://httpstatuses.io/{(int)status}"
             };
 
-            // Корисно віддати traceId клієнту
             pd.Extensions["traceId"] = ctx.TraceIdentifier;
 
             ctx.Response.ContentType = "application/problem+json";

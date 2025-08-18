@@ -23,27 +23,36 @@ public sealed class FlightRepository : IFlightRepository
         return Map(rdr);
     }
 
-    public Task<IReadOnlyList<Flight>> GetByDateAsync(DateOnly date, CancellationToken ct) =>
-        QueryListAsync("dbo.GetFlightsByDate",
+    public Task<IReadOnlyList<Flight>> GetByDateAsync(DateOnly date, CancellationToken ct)
+    {
+        return QueryListAsync("dbo.GetFlightsByDate",
             new SqlParameter("@Date", SqlDbType.Date) { Value = date.ToDateTime(TimeOnly.MinValue) }, ct);
-
-    public Task<IReadOnlyList<Flight>> GetByDepartureCityAndDateAsync(string city, DateOnly date, CancellationToken ct) =>
-        QueryListAsync("dbo.GetFlightsByDepartureCityAndDate", new[]
+    }
+        
+    public Task<IReadOnlyList<Flight>> GetByDepartureCityAndDateAsync(string city, DateOnly date, CancellationToken ct)
+    {
+        return QueryListAsync("dbo.GetFlightsByDepartureCityAndDate", new[]
         {
             new SqlParameter("@City", SqlDbType.NVarChar, 100){ Value = city },
             new SqlParameter("@Date", SqlDbType.Date){ Value = date.ToDateTime(TimeOnly.MinValue) }
         }, ct);
-
-    public Task<IReadOnlyList<Flight>> GetByArrivalCityAndDateAsync(string city, DateOnly date, CancellationToken ct) =>
-        QueryListAsync("dbo.GetFlightsByArrivalCityAndDate", new[]
+    }
+        
+    public Task<IReadOnlyList<Flight>> GetByArrivalCityAndDateAsync(string city, DateOnly date, CancellationToken ct)
+    {
+        return QueryListAsync("dbo.GetFlightsByArrivalCityAndDate", new[]
         {
             new SqlParameter("@City", SqlDbType.NVarChar, 100){ Value = city },
             new SqlParameter("@Date", SqlDbType.Date){ Value = date.ToDateTime(TimeOnly.MinValue) }
         }, ct);
+    }
+        
 
-    private async Task<IReadOnlyList<Flight>> QueryListAsync(string sp, SqlParameter param, CancellationToken ct) =>
-        await QueryListAsync(sp, new[] { param }, ct);
-
+    private async Task<IReadOnlyList<Flight>> QueryListAsync(string sp, SqlParameter param, CancellationToken ct)
+    {
+        return await QueryListAsync(sp, new[] { param }, ct);
+    }
+        
     private async Task<IReadOnlyList<Flight>> QueryListAsync(string sp, SqlParameter[] parameters, CancellationToken ct)
     {
         var list = new List<Flight>();
@@ -54,7 +63,9 @@ public sealed class FlightRepository : IFlightRepository
         await con.OpenAsync(ct);
         await using var rdr = await cmd.ExecuteReaderAsync(CommandBehavior.CloseConnection, ct);
         while (await rdr.ReadAsync(ct))
+        {
             list.Add(Map(rdr));
+        }
         return list;
     }
 

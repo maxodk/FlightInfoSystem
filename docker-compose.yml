@@ -41,5 +41,12 @@ services:
     ports:
       - "8081:8080"
 
+  cleanupworker:
+    image: ${DOCKER_REGISTRY-}cleanupworker
+    build:
+      context: .
+      dockerfile: CleanupWorker/Dockerfile
+
 volumes:
   mssql_data:
+

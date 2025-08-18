@@ -11,40 +11,68 @@ public sealed class HomeController : Controller
 
     public HomeController(IFlightsApiClient api, ILogger<HomeController> log)
     {
-        _api = api; _log = log;
+        _api = api;
+        _log = log;
     }
 
     public IActionResult Index() => View();
 
     [HttpPost]
     public async Task<IActionResult> ByNumber(string flightNumber, CancellationToken ct)
-        => await SafeResults(async () =>
+    {
+        return await SafeResults(async () =>
         {
             if (string.IsNullOrWhiteSpace(flightNumber))
+            {
                 return new List<FlightDto>();
-            var f = await _api.GetByNumberAsync(flightNumber.Trim(), ct);
-            return f is null ? new List<FlightDto>() : new List<FlightDto> { f };
+            }
+
+            flightNumber = flightNumber.Trim();
+            var flight = await _api.GetByNumberAsync(flightNumber, ct);
+
+            if (flight == null)
+            {
+                return new List<FlightDto>();
+            }
+
+            return new List<FlightDto> { flight };
         });
+    }
+
 
     [HttpPost]
     public async Task<IActionResult> ByDate(string date, CancellationToken ct)
-        => await SafeResults(() => _api.GetByDateAsync(date, ct));
+    { 
+         return await SafeResults(() => _api.GetByDateAsync(date, ct)); 
+    }
 
     [HttpPost]
     public async Task<IActionResult> ByDeparture(string city, string date, CancellationToken ct)
-        => await SafeResults(() =>
+    {
+        return await SafeResults(() =>
         {
-            if (string.IsNullOrWhiteSpace(city)) return Task.FromResult<IReadOnlyList<FlightDto>>(new List<FlightDto>());
+            if (string.IsNullOrWhiteSpace(city))
+            {
+                return Task.FromResult<IReadOnlyList<FlightDto>>(new List<FlightDto>());
+            }
             return _api.GetByDepartureAsync(city.Trim(), date, ct);
         });
+    }
+        
 
     [HttpPost]
     public async Task<IActionResult> ByArrival(string city, string date, CancellationToken ct)
-        => await SafeResults(() =>
+    {
+        return await SafeResults(() =>
         {
-            if (string.IsNullOrWhiteSpace(city)) return Task.FromResult<IReadOnlyList<FlightDto>>(new List<FlightDto>());
+            if (string.IsNullOrWhiteSpace(city))
+            {
+                return Task.FromResult<IReadOnlyList<FlightDto>>(new List<FlightDto>());
+            } 
             return _api.GetByArrivalAsync(city.Trim(), date, ct);
         });
+    }
+        
 
     private async Task<IActionResult> SafeResults(Func<Task<IReadOnlyList<FlightDto>>> action)
     {
@@ -61,28 +89,26 @@ public sealed class HomeController : Controller
             var detail = apiEx.Problem?.Detail;
             var trace = apiEx.Problem?.Extensions.TryGetValue("traceId", out var t) == true ? t?.ToString() : null;
 
-            // user-friendly ????????????
             var friendly = status switch
             {
-                400 => "????????? ??????????? ???????? ?????.",
-                404 => "?? ????? ??????? ?????? ?? ????????.",
-                429 => "???????? ???????. ????????? ?? ??? ????? ???????.",
-                500 => "?? ??????? ??????? ???????. ????????? ???????.",
-                _ => "??????? ??????? ??? ????????? ??????."
+                400 => "Bad request.",
+                404 => "Not Found.",
+                429 => "Too many requests.",
+                500 => "Internal server error.",
+                _ => "Unhandled error."
             };
 
-            // ??????????? ????? ??? UI
             ViewBag.Error = $"{status} {title}. {friendly}" + (detail is not null ? $" ??????: {detail}" : "") + (trace is not null ? $" (traceId: {trace})" : "");
             return View("Results", Enumerable.Empty<FlightDto>());
         }
         catch (HttpRequestException ex)
         {
-            ViewBag.Error = $"API ???????????: {ex.Message}";
+            ViewBag.Error = $"API error: {ex.Message}";
             return View("Results", Enumerable.Empty<FlightDto>());
         }
         catch (Exception ex)
         {
-            ViewBag.Error = $"??????????? ???????: {ex.Message}";
+            ViewBag.Error = $": {ex.Message}";
             return View("Results", Enumerable.Empty<FlightDto>());
         }
     }

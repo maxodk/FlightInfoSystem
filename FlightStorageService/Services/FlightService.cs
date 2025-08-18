@@ -23,14 +23,15 @@ public sealed class FlightService : IFlightService
     {
         AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(2),
         SlidingExpiration = TimeSpan.FromSeconds(30),
-        Size = 1 // ← залишай закоментованим, якщо ти не вмикав SizeLimit у AddMemoryCache
+        Size = 1
     };
 
     public async Task<Flight?> GetByNumberAsync(string flightNumber, CancellationToken ct = default)
     {
         if (string.IsNullOrWhiteSpace(flightNumber))
+        {
             throw new ArgumentException("Flight number is required.", nameof(flightNumber));
-
+        }
         var num = flightNumber.Trim();
         var key = $"num:{num.ToUpperInvariant()}";
 
@@ -42,7 +43,7 @@ public sealed class FlightService : IFlightService
 
         _log.LogInformation("CACHE MISS  {Key}", key);
         var res = await _repo.GetByNumberAsync(num, ct);
-        _cache.Set(key, res, CacheEntry()); // кешуємо навіть null (negative caching)
+        _cache.Set(key, res, CacheEntry());
         return res;
     }
 
@@ -110,11 +111,13 @@ public sealed class FlightService : IFlightService
     private static DateOnly ParseDate(string? dateIso)
     {
         if (string.IsNullOrWhiteSpace(dateIso))
+        {
             throw new ArgumentException("Date is required. Expected format: yyyy-MM-dd.", nameof(dateIso));
-        if (!DateOnly.TryParseExact(dateIso, "yyyy-MM-dd", CultureInfo.InvariantCulture,
-                                    DateTimeStyles.None, out var d))
+        }  
+        if (!DateOnly.TryParseExact(dateIso, "yyyy-MM-dd", CultureInfo.InvariantCulture,DateTimeStyles.None, out var d))
+        {
             throw new ArgumentException("Invalid date. Expected format: yyyy-MM-dd.", nameof(dateIso));
-
+        }
         return d;
     }
 }

@@ -18,15 +18,15 @@ public sealed class FlightsController : ControllerBase
 
     public FlightsController(IFlightService svc, ILogger<FlightsController> log)
     {
-        _svc = svc; _log = log;
+        _svc = svc;
+        _log = log;
     }
 
     // GET /api/flights/PS101
     [HttpGet("{flightNumber}")]
     [SwaggerOperation(
             Summary = "Отримати рейс за номером",
-            Description = "Використовує збережену процедуру dbo.GetFlightByNumber."
-        )]
+            Description = "Використовує збережену процедуру dbo.GetFlightByNumber.")]
     [ProducesResponseType(typeof(Flight), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status429TooManyRequests)]
@@ -42,38 +42,41 @@ public sealed class FlightsController : ControllerBase
     [HttpGet]
     [SwaggerOperation(
             Summary = "Отримати рейс за датою (UTC)",
-            Description = "Використовує збережену процедуру dbo.GetFlightsByDate."
-        )]
+            Description = "Використовує збережену процедуру dbo.GetFlightsByDate.")]
     [ProducesResponseType(typeof(IEnumerable<Flight>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status429TooManyRequests)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetByDate([FromQuery] string date, CancellationToken ct)
-        => Ok(await _svc.GetByDateAsync(date, ct));
-
+    {
+        return Ok(await _svc.GetByDateAsync(date, ct));
+    }
+      
     // GET /api/flights/departure?city=Kyiv&date=2025-08-15
     [HttpGet("departure")]
     [SwaggerOperation(
             Summary = "Отримати рейс за містом вильоту + датою",
-            Description = "Використовує збережену процедуру dbo.GetFlightsByDepartureCityAndDate."
-        )]
+            Description = "Використовує збережену процедуру dbo.GetFlightsByDepartureCityAndDate.")]
     [ProducesResponseType(typeof(IEnumerable<Flight>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status429TooManyRequests)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetByDeparture([FromQuery] string city, [FromQuery] string date, CancellationToken ct)
-        => Ok(await _svc.GetByDepartureAsync(city, date, ct));
+    {
+        return Ok(await _svc.GetByDepartureAsync(city, date, ct));
+    }
 
     // GET /api/flights/arrival?city=Warsaw&date=2025-08-15
     [HttpGet("arrival")]
     [SwaggerOperation(
             Summary = "Отримати рейс за містом прильоту + датою",
-            Description = "Використовує збережену процедуру dbo.GetFlightsByArrivalCityAndDate."
-        )]
+            Description = "Використовує збережену процедуру dbo.GetFlightsByArrivalCityAndDate.")]
     [ProducesResponseType(typeof(IEnumerable<Flight>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status429TooManyRequests)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetByArrival([FromQuery] string city, [FromQuery] string date, CancellationToken ct)
-        => Ok(await _svc.GetByArrivalAsync(city, date, ct));
+    {
+        return Ok(await _svc.GetByArrivalAsync(city, date, ct));
+    }
 }
