@@ -24,6 +24,7 @@
 FlightInfoSystem/
 ├── FlightStorageService/ # Web API
 ├── FlightClientApp/ # MVC клієнт
+├── CleanupWorker/ # Воркер для очищення БД
 ├─ db/
 │ └── init.sql # SQL-скрипт створення БД та збережених процедур
 ├── README.md
