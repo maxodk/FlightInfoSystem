@@ -1,8 +1,12 @@
-﻿using FlightStorageService.Models;
+﻿using Confluent.Kafka;
+using FlightStorageService.Models;
 using FlightStorageService.Repositories;
+using KafkaExample.Services;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using System.Globalization;
+using System.Text.Json;
+using static Confluent.Kafka.ConfigPropertyNames;
 
 namespace FlightStorageService.Services;
 
@@ -11,12 +15,14 @@ public sealed class FlightService : IFlightService
     private readonly IFlightRepository _repo;
     private readonly ILogger<FlightService> _log;
     private readonly IMemoryCache _cache;
+    private readonly IHostedService _hostedService;
 
-    public FlightService(IFlightRepository repo, ILogger<FlightService> log, IMemoryCache cache)
+    public FlightService(IFlightRepository repo, ILogger<FlightService> log, IMemoryCache cache,IHostedService hostedService)
     {
         _repo = repo;
         _log = log;
         _cache = cache;
+        _hostedService = hostedService;
     }
 
     private static MemoryCacheEntryOptions CacheEntry() => new()
@@ -34,7 +40,6 @@ public sealed class FlightService : IFlightService
         }
         var num = flightNumber.Trim();
         var key = $"num:{num.ToUpperInvariant()}";
-
         if (_cache.TryGetValue(key, out Flight? cachedNum))
         {
             _log.LogInformation("CACHE HIT   {Key}", key);

@@ -1,7 +1,9 @@
-﻿using FlightStorageService.Middleware;
+﻿using Confluent.Kafka;
+using FlightStorageService.Middleware;
 using FlightStorageService.Models;
 using FlightStorageService.Repositories;
 using FlightStorageService.Services;
+using KafkaExample.Services;
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.Data.SqlClient;
 using Microsoft.OpenApi.Models;
@@ -10,10 +12,12 @@ using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Controllers + Swagger
+
 builder.Services.AddControllers();
-// Swagger
+
 builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddSingleton<IKafkaProducerService, KafkaProducerService>();
 
 builder.Services.AddSwaggerGen(o =>
 {
@@ -107,7 +111,16 @@ builder.Services.AddCors(options =>
 builder.Services.AddScoped<IFlightRepository, FlightRepository>();
 builder.Services.AddScoped<IFlightService, FlightService>();
 
+if (builder.Configuration.GetValue<bool>("Kafka:Enabled"))
+{
+    builder.Services.AddHostedService<KafkaConsumerService>();
+}
+// ...
+
 var app = builder.Build();
+
+app.MapGet("/healthz", () => Results.Ok(new { status = "ok" }));
+
 
 app.UseMiddleware<ProblemDetailsMiddleware>();
 

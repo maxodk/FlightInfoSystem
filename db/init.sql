@@ -26,6 +26,9 @@ BEGIN
         DepartureAirportCity NVARCHAR(100) NOT NULL,
         ArrivalAirportCity   NVARCHAR(100) NOT NULL,
         DurationMinutes      INT           NOT NULL,
+        Status BIT NOT NULL CONSTRAINT DF_YourTableName_Status DEFAULT 1,
+        CreatedAtUtc DATETIME2 NOT NULL CONSTRAINT DF_YourTableName_CreatedAtUtc DEFAULT SYSUTCDATETIME()
+        
 
         CONSTRAINT PK_Flights PRIMARY KEY CLUSTERED (FlightNumber),
         CONSTRAINT CK_Flights_Duration_Positive CHECK (DurationMinutes > 0),
@@ -100,21 +103,23 @@ BEGIN
         IF EXISTS (SELECT 1 FROM dbo.Flights WHERE FlightNumber = @FlightNumber)
             THROW 50006, 'Flight with the same FlightNumber already exists.', 1;
 
+        -- Insert new flight with Status = 1 and CreatedAtUtc = current UTC
         INSERT INTO dbo.Flights
         (
             FlightNumber, DepartureDateTime, DepartureAirportCity,
-            ArrivalAirportCity, DurationMinutes
+            ArrivalAirportCity, DurationMinutes, Status, CreatedAtUtc
         )
         VALUES
         (
             @FlightNumber, @DepartureDateTime, LTRIM(RTRIM(@DepartureAirportCity)),
-            LTRIM(RTRIM(@ArrivalAirportCity)), @DurationMinutes
+            LTRIM(RTRIM(@ArrivalAirportCity)), @DurationMinutes, 1, SYSUTCDATETIME()
         );
 
         -- Return inserted row
         SELECT f.*
         FROM dbo.Flights AS f
         WHERE f.FlightNumber = @FlightNumber;
+
     END TRY
     BEGIN CATCH
         DECLARE @msg NVARCHAR(4000) = ERROR_MESSAGE();
@@ -206,9 +211,9 @@ CREATE PROCEDURE dbo.CleanupOldFlights
 AS
 BEGIN
     SET NOCOUNT ON;
-
-    DELETE FROM dbo.Flights
-    WHERE DepartureDateTime < SYSUTCDATETIME();
+    UPDATE dbo.Flights
+    SET Status = 0
+    WHERE DepartureDateTime < DATEADD(DAY, -7, SYSUTCDATETIME());
 END
 GO
 

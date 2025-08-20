@@ -1,5 +1,7 @@
-﻿using FlightStorageService.Models;
+﻿using Confluent.Kafka;
+using FlightStorageService.Models;
 using FlightStorageService.Services;
+using KafkaExample.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Swashbuckle.AspNetCore.Annotations;
@@ -15,11 +17,13 @@ public sealed class FlightsController : ControllerBase
 {
     private readonly IFlightService _svc;
     private readonly ILogger<FlightsController> _log;
+    private readonly IKafkaProducerService _producerService;
 
-    public FlightsController(IFlightService svc, ILogger<FlightsController> log)
+    public FlightsController(IFlightService svc, ILogger<FlightsController> log, IKafkaProducerService producerService)
     {
         _svc = svc;
         _log = log;
+        _producerService = producerService;
     }
 
     // GET /api/flights/PS101
@@ -35,7 +39,10 @@ public sealed class FlightsController : ControllerBase
     {
         _log.LogInformation("Fetching from DB...");
         var f = await _svc.GetByNumberAsync(flightNumber, ct);
-        return f is null ? NotFound() : Ok(f);
+        if (f is null)
+            return NotFound();
+        await _producerService.SendMessageAsync("Flight", $"FlightGetByNymb:'{flightNumber}'");
+        return Ok(f);
     }
 
     // GET /api/flights?date=2025-08-15
