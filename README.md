@@ -2,12 +2,13 @@
 
 ## Опис
 
-Система складається з двох підсистем:
+Система складається з трьох підсистем:
 
 1. **FlightStorageService** – бекенд (ASP.NET Core Web API), який зберігає та надає дані про авіарейси.
 2. **FlightClientApp** – фронтенд (ASP.NET MVC/Razor Pages), який надає простий веб-інтерфейс для пошуку рейсів через REST API.
+3. **CleanupWorker** – воркер(ASP.NET Worker), який очищує таблицю в БД від застарілих рейсів.
 
-Взаємодія з базою даних відбувається через **ADO.NET** (SqlConnection, SqlCommand) та **збережені процедури** у MS SQL Server.
+Взаємодія з базою даних відбувається через **ADO.NET** (SqlConnection, SqlCommand) та **збережені процедури** у MS SQL Server. Взаємодія сервісів і воркера відбувається через Kafka
 
 ## Технології
 
@@ -18,6 +19,7 @@
 - MS SQL Server 2019+
 - Swagger (Swashbuckle)
 - Bootstrap (UI)
+- Bitnami Kafka v.4.0.0.
 
 ## Структура репозиторію
 ```
