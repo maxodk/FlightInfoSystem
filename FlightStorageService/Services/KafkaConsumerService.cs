@@ -1,5 +1,6 @@
 ﻿// Services/KafkaConsumerService.cs
 using Confluent.Kafka;
+using FlightStorageService.Caching;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -9,9 +10,9 @@ public sealed class KafkaConsumerService : BackgroundService
 {
     private readonly ILogger<KafkaConsumerService> _log;
     private readonly IConfiguration _cfg;
-    private readonly IMemoryCache _cache;
+    private readonly IAppCache _cache;
 
-    public KafkaConsumerService(ILogger<KafkaConsumerService> log, IConfiguration cfg, IMemoryCache cache)
+    public KafkaConsumerService(ILogger<KafkaConsumerService> log, IConfiguration cfg, IAppCache cache)
     {
         _log = log;
         _cfg = cfg;
@@ -62,11 +63,10 @@ public sealed class KafkaConsumerService : BackgroundService
 
                         if (cr.Message.Value.Trim().Equals("Worker cleaned up successfully", StringComparison.OrdinalIgnoreCase))
                         {
-                            if (_cache is MemoryCache memCache)
-                            {
-                                memCache.Compact(1.0);
-                                _log.LogInformation("MemoryCache cleared by Kafka message.");
-                            }
+
+                            await _cache.ClearAllAsync(stoppingToken);
+                            _log.LogInformation("Cache cleared by Kafka message.");
+                            
                         }
                     }
                 }

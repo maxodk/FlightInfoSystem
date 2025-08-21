@@ -1,4 +1,5 @@
 ﻿using Confluent.Kafka;
+using FlightStorageService.Caching;
 using FlightStorageService.Middleware;
 using FlightStorageService.Models;
 using FlightStorageService.Repositories;
@@ -7,6 +8,7 @@ using KafkaExample.Services;
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.Data.SqlClient;
 using Microsoft.OpenApi.Models;
+using StackExchange.Redis;
 using System.Reflection;
 using System.Threading.RateLimiting;
 
@@ -56,7 +58,7 @@ builder.Services.AddRateLimiter(options =>
         }
         else
         {
-            partitionKey = ClientType.Anonimous;
+            partitionKey = ClientTypeMode.Anonimous;
         }
 
         return RateLimitPartition.GetFixedWindowLimiter(
@@ -114,6 +116,31 @@ builder.Services.AddScoped<IFlightService, FlightService>();
 if (builder.Configuration.GetValue<bool>("Kafka:Enabled"))
 {
     builder.Services.AddHostedService<KafkaConsumerService>();
+}
+
+builder.Services.Configure<RedisOptions>(builder.Configuration.GetSection("Redis"));
+
+var cacheMode = builder.Configuration["Cache:Mode"] ?? builder.Configuration["Cache__Mode"] ?? "Redis";
+if (string.Equals(cacheMode, "Redis", StringComparison.OrdinalIgnoreCase))
+{
+    var connStr = builder.Configuration["Redis:Connection"] ?? builder.Configuration["Redis__Connection"]!;
+    var mux = await ConnectionMultiplexer.ConnectAsync(connStr);
+    builder.Services.AddSingleton<IConnectionMultiplexer>(mux);
+
+    builder.Services.AddStackExchangeRedisCache(o =>
+    {
+        o.Configuration = connStr;
+        o.InstanceName = builder.Configuration["Redis:InstanceName"]
+                         ?? builder.Configuration["Redis__InstanceName"]
+                         ?? "fis:";
+    });
+
+    builder.Services.AddSingleton<IAppCache, RedisAppCache>();
+}
+else
+{
+    builder.Services.AddDistributedMemoryCache();
+    builder.Services.AddSingleton<IAppCache, InMemoryAppCache>();
 }
 // ...
 

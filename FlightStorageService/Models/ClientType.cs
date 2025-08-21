@@ -1,6 +1,6 @@
 ﻿namespace FlightStorageService.Models
 {
-    public struct ClientType
+    public struct ClientTypeMode
     {
         public const string Anonimous = "anon";
     }
